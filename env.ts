@@ -21,4 +21,6 @@ export default Env.rules({
   APP_NAME: Env.schema.string(),
   DRIVE_DISK: Env.schema.enum(['local'] as const),
   NODE_ENV: Env.schema.enum(['development', 'production', 'test'] as const),
+  // HUBSPOT_API_KEY, type string
+  HUBSPOT_API_KEY: Env.schema.string(),
 })
