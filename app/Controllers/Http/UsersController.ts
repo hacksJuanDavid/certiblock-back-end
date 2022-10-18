@@ -1,6 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Env from '@ioc:Adonis/Core/Env'
 import { Client } from '@hubspot/api-client'
+import { createUser } from 'App/Utils/CreateUser'
 
 export default class UsersController {
   // Router GET /users api route
@@ -39,10 +40,21 @@ export default class UsersController {
     const hubspotClient = new Client({ accessToken: Env.get('HUBSPOT_API_KEY') })
 
     // get user data from request body
-    const userData = { properties: request.body() }
+    // structure of user data (first_name, last_name, email)
+    const userData = {
+      properties: (({ first_name, last_name, email }) => ({ first_name, last_name, email }))(
+        request.body()
+      ),
+    }
 
     // create user in hubspot
     const user = await hubspotClient.crm.contacts.basicApi.create(userData)
+
+    // create random password
+    const password = Math.random().toString(36).slice(-8)
+
+    // create user in database
+    await createUser({email: user.properties.email, hubspot_id: parseInt(user.id), password: password})
 
     // return user
     return response.created({
@@ -84,4 +96,7 @@ export default class UsersController {
       user,
     })
   }*/
+
+  
+
 }

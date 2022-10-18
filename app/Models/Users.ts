@@ -9,6 +9,9 @@ export default class Users extends BaseModel {
   @column()
   public email: string
 
+  @column()
+  public hubspot_id: number
+
   @column({ serializeAs: null })
   public password: string
 

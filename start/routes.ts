@@ -24,11 +24,22 @@ Route.get('/', async () => {
   return { hello: 'world' }
 })
 
-// Router GET /users api route
-Route.get('/users/:id?', 'UsersController.index')
+// Route group for users with jwt authentication
+Route.group(() => {
+  // Router GET /users api route
+  Route.get('/:id?', 'UsersController.index')
 
-// Router POST /users api route
-Route.post('/users', 'UsersController.store')
+  // Router POST /users api route
+  Route.post('/', 'UsersController.store')
 
-// Router PUT /users/:id api route
-Route.put('/users/:id', 'UsersController.update')
+  // Router PUT /users/:id api route
+  Route.put('/:id', 'UsersController.update')
+})
+  .prefix('users')
+  .middleware('auth:jwt')
+
+// Route for registering users
+Route.post('/register', 'AuthController.register')
+
+// Route for logging in users
+Route.post('/login', 'AuthController.login').middleware('userExists')

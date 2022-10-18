@@ -39,5 +39,6 @@ Server.middleware.register([() => import('@ioc:Adonis/Core/BodyParser')])
 |
 */
 Server.middleware.registerNamed({
-    userMustExist: () => import('App/Middleware/UserMustExist'),
+    userExists: () => import('App/Middleware/UserExists'),
+    auth: () => import('App/Middleware/Auth'),
 })
