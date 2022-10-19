@@ -5,7 +5,7 @@
  * file.
  */
 
-import Users from 'App/Models/Users'
+import User from 'App/Models/User'
 import { JWTGuardConfig, JWTGuardContract } from "@ioc:Adonis/Addons/Jwt";
 
 declare module '@ioc:Adonis/Addons/Auth' {
@@ -35,8 +35,8 @@ declare module '@ioc:Adonis/Addons/Auth' {
     |
     */
     user: {
-      implementation: LucidProviderContract<typeof Users>
-      config: LucidProviderConfig<typeof Users>
+      implementation: LucidProviderContract<typeof User>
+      config: LucidProviderConfig<typeof User>
     }
   }
 

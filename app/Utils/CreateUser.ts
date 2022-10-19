@@ -1,9 +1,9 @@
-import Users from 'App/Models/Users'
+import User from 'App/Models/User'
 
 // Create a new user on database, public method
-export async function createUser(userData: any): Promise<Users> {
+export async function createUser(userData: any): Promise<User> {
   // create user in database
-  const user = await Users.create(userData)
+  const user = await User.create(userData)
   // return user
   return user
 }

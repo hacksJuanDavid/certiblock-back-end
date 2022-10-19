@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import Hash from '@ioc:Adonis/Core/Hash'
 import { column, beforeSave, BaseModel } from '@ioc:Adonis/Lucid/Orm'
 
-export default class Users extends BaseModel {
+export default class User extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
@@ -10,7 +10,7 @@ export default class Users extends BaseModel {
   public email: string
 
   @column()
-  public hubspot_id: number
+  public hubspotId: number
 
   @column({ serializeAs: null })
   public password: string
@@ -25,7 +25,7 @@ export default class Users extends BaseModel {
   public updatedAt: DateTime
 
   @beforeSave()
-  public static async hashPassword (User: Users) {
+  public static async hashPassword (User: User) {
     if (User.$dirty.password) {
       User.password = await Hash.make(User.password)
     }
