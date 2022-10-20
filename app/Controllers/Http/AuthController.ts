@@ -9,8 +9,6 @@ export default class AuthController {
     // Initialize hubspot client
     const hubspotClient = new Client({ accessToken: Env.get('HUBSPOT_API_KEY') })
 
-    getUserFromHubspot(request.body().email)
-
     // get user data from request body
     // structure of user data (firstname, lastname, email)
     const userData = {

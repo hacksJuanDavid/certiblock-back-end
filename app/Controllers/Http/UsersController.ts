@@ -54,7 +54,11 @@ export default class UsersController {
     const password = Math.random().toString(36).slice(-8)
 
     // create user in database
-    await createUser({email: user.properties.email, hubspot_id: parseInt(user.id), password: password})
+    await createUser({
+      email: user.properties.email,
+      hubspot_id: parseInt(user.id),
+      password: password,
+    })
 
     // return user
     return response.created({
@@ -96,7 +100,4 @@ export default class UsersController {
       user,
     })
   }*/
-
-  
-
 }

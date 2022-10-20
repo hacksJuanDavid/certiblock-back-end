@@ -43,3 +43,13 @@ Route.post('/register', 'AuthController.register')
 
 // Route for logging in users
 Route.post('/login', 'AuthController.login').middleware('userExists')
+
+//Route group for qr whit api
+
+Route.group(() => {
+  //Route for QR
+  Route.get('/qr/:id', 'QrsController.index')
+
+  //Route for generating QR
+  Route.post('/qr', 'QrsController.store')
+})
