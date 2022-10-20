@@ -13,8 +13,8 @@ export default class UserExists {
     if (user) {
       await next()
     } else {
-      // return 401 unauthorized
-      return response.unauthorized({
+      // return 404 unauthorized
+      return response.notFound({
         message: 'User does not exist',
       })
     }
