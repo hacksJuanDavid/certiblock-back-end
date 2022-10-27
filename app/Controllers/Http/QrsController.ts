@@ -75,7 +75,7 @@ export default class QrsController {
     // structure of qr data
     const qrData = request.body()
 
-    const url = `${Env.get('APP_URL')}/qrdatas/${uuidv5(qrData.id, Env.get('QR_KEY'))}`
+    const url = `${Env.get('APP_URL')}/qrs/${uuidv5(qrData.id, Env.get('QR_KEY'))}`
     // create qr in hubspot custom object
     const qr = await hubspotClient.crm.objects.basicApi.create('qrdatas', {
       properties: {
