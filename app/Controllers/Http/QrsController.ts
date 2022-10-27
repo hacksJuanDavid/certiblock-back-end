@@ -15,8 +15,8 @@ export default class QrsController {
   public async index({ response, params }: HttpContextContract) {
     // if params.id is not null, get qr by uuid from hubspot else return error 404
     if (params.id) {
-      // get page of qrs from hubspot
-      const page = await hubspotClient.crm.objects.basicApi.getPage('qrs', undefined, undefined, [
+      // get page of qrdatas from hubspot
+      const page = await hubspotClient.crm.objects.basicApi.getPage('qrdatas', undefined, undefined, [
         'uuid',
         'url',
         'readed',
@@ -35,7 +35,7 @@ export default class QrsController {
         if (qr.properties.readed === 'false') {
 
           // update qr in huspot, set readed to true and update updatedat property and readedat property
-          await hubspotClient.crm.objects.basicApi.update('qrs', qr.id, {
+          await hubspotClient.crm.objects.basicApi.update('qrdatas', qr.id, {
             properties: {
               readed: 'true',
               updatedat: new Date().toISOString(),
@@ -75,9 +75,9 @@ export default class QrsController {
     // structure of qr data
     const qrData = request.body()
 
-    const url = `${Env.get('APP_URL')}/qrs/${uuidv5(qrData.id, Env.get('QR_KEY'))}`
+    const url = `${Env.get('APP_URL')}/qrdatas/${uuidv5(qrData.id, Env.get('QR_KEY'))}`
     // create qr in hubspot custom object
-    const qr = await hubspotClient.crm.objects.basicApi.create('qrs', {
+    const qr = await hubspotClient.crm.objects.basicApi.create('qrdatas', {
       properties: {
         createdat: new Date().toISOString(),
         updatedat: new Date().toISOString(),
