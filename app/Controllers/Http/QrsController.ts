@@ -1,74 +1,103 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { schema } from '@ioc:Adonis/Core/Validator'
-import QrData from 'App/Models/QrData'
 import { v5 as uuidv5 } from 'uuid'
 import Env from '@ioc:Adonis/Core/Env'
+import { Client } from '@hubspot/api-client'
+import { schema } from "@ioc:Adonis/Core/Validator"
+
+// Initialize hubspot client
+const hubspotClient = new Client({ accessToken: Env.get('HUBSPOT_API_KEY') })
+
+// Check if qrs object exists in hubspot
 
 export default class QrsController {
-  //Default route QR
+
+  // Router GET /qrs api route
   public async index({ response, params }: HttpContextContract) {
-    //return qr with id
-    const qr = await QrData.findByOrFail('idQR', params.id)
+    // if params.id is not null, get qr by uuid from hubspot else return error 404
+    if (params.id) {
+      // get page of qrs from hubspot
+      const page = await hubspotClient.crm.objects.basicApi.getPage('qrs', undefined, undefined, [
+        'uuid',
+        'url',
+        'readed',
+        'readedat',
+        'externalid',
+        'externalurl',
+        'externalreadedurl',
+      ])
 
-    //Update state qr
-    qr.stateQR = true
-    // qr.urlQR = 'https://www.youtube.com/watch?v=QH2-TGUlwu4'
+      // get qr with uuid
+      const qr = page.results.find((qr) => qr.properties.uuid === params.id)
 
-    //Save qr data
-    await qr.save()
+      // if qr exists, return qr else return error 404
+      if (qr) {
+        // if qr isn't readed, return qr else return error 404
+        if (qr.properties.readed === 'false') {
 
-    if (qr) {
-      //Redirect to origin url qr
-      return response.redirect(qr.urlQR)
-    } else {
-      //Not found qr
-      return response.notFound({
-        message: 'QR not found',
-      })
-    }
-  }
+          // update qr in huspot, set readed to true and update updatedat property and readedat property
+          await hubspotClient.crm.objects.basicApi.update('qrs', qr.id, {
+            properties: {
+              readed: 'true',
+              updatedat: new Date().toISOString(),
+              readedat: new Date().toISOString(),
+            },
+          })
 
-  //Create QR
-  public async store({ request, response }: HttpContextContract) {
-    //Validator required json array
-    const validatoprScheme = schema.create({
-      qrInformation: schema.array().members(
-        schema.object().members({
-          idQR: schema.number(),
-          urlQR: schema.string(),
-        })
-      ),
-    })
-
-    //Validate request
-    await request.validate({ schema: validatoprScheme })
-
-    //Get post request data
-    const { qrInformation } = request.body()
-
-    //Map qr information and add api url and state qr
-    const qrInformationWithApiUrl = qrInformation.map((qr) => {
-      return {
-        urlQR: qr.urlQR,
-
-        //Generate uuid v5 whit id
-        idQR: uuidv5(qr.idQR.toString(), Env.get('QR_KEY')),
-        apiUrl: `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=/http://127.0.0.1:3333/${qr.idQR}&choe=UTF-8`,
-        stateQR: false,
+          // redirect to external url
+          return response.redirect(qr.properties.externalurl)
+        } else {
+          // redirect to external readed url
+          return response.redirect(qr.properties.externalreadedurl)
+        }
       }
-    }, [])
+    }
 
-    //Save qr information in database and save in variable
-    const qrData = await QrData.createMany(qrInformationWithApiUrl)
-
-    //Return save data
-    return response.ok({
-      message: 'QR data saved',
-      qrData,
+    // return 404 error
+    return response.notFound({
+      message: 'QR not found',
     })
   }
 
-  public async update({}: HttpContextContract) {}
 
-  public async destroy({}: HttpContextContract) {}
+  // Router POST /qrs api route
+  public async store({ request, response }: HttpContextContract) {
+    // Validate request body
+    const postSchema = schema.create({
+      id: schema.number(),
+      url: schema.string(),
+      readedUrl: schema.string(),
+    })
+
+    // get validated data from request body
+    await request.validate({ schema: postSchema })
+
+    // get qr data from request body
+    // structure of qr data
+    const qrData = request.body()
+
+    const url = `${Env.get('APP_URL')}/qrs/${uuidv5(qrData.id, Env.get('QR_KEY'))}`
+    // create qr in hubspot custom object
+    const qr = await hubspotClient.crm.objects.basicApi.create('qrs', {
+      properties: {
+        createdat: new Date().toISOString(),
+        updatedat: new Date().toISOString(),
+        uuid: uuidv5(qrData.id, Env.get('QR_KEY')),
+        url: url,
+        readed: "false",
+        externalid: qrData.id,
+        externalurl: qrData.url,
+        externalreadedurl: qrData.readedUrl,
+        // QR url from google api
+        qrimage: "https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=" + url + "&choe=UTF-8",
+      },
+    })
+
+    // return qr image with status 201
+    return response.created({
+      message: 'QR created',
+      qr: qr.properties.qrimage,
+      id: qr.properties.uuid,
+    })
+  }
+
 }

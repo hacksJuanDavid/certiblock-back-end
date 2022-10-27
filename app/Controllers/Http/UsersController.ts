@@ -2,13 +2,16 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Env from '@ioc:Adonis/Core/Env'
 import { Client } from '@hubspot/api-client'
 import { createUser } from 'App/Utils/CreateUser'
+import { schema } from "@ioc:Adonis/Core/Validator"
+
+// initialize hubspot client
+const hubspotClient = new Client({ accessToken: Env.get('HUBSPOT_API_KEY') })
 
 export default class UsersController {
   // Router GET /users api route
   public async index({ response, params }: HttpContextContract) {
-    // initialize hubspot client
-    const hubspotClient = new Client({ accessToken: Env.get('HUBSPOT_API_KEY') })
-
+    
+    // get page of users from hubspot
     const page = await hubspotClient.crm.contacts.basicApi.getPage()
     // if params.id is not null, return user with id else return all users
     if (params.id) {
@@ -36,15 +39,25 @@ export default class UsersController {
 
   // Router POST /users api route
   public async store({ request, response }: HttpContextContract) {
-    // initialize hubspot client
-    const hubspotClient = new Client({ accessToken: Env.get('HUBSPOT_API_KEY') })
+    
+    // Validate request body
+    const postSchema = schema.create({
+      firstName: schema.string(),
+      lastName: schema.string(),
+      email: schema.string(),
+    })
+
+    // get validated data from request body
+    await request.validate({ schema: postSchema })
 
     // get user data from request body
-    // structure of user data (first_name, last_name, email)
+    // structure of user data (firstname, lastname, email)
     const userData = {
-      properties: (({ first_name, last_name, email }) => ({ first_name, last_name, email }))(
-        request.body()
-      ),
+      properties: {
+        firstname: request.body().firstName,
+        lastname: request.body().lastName,
+        email: request.body().email,
+      }
     }
 
     // create user in hubspot
@@ -69,8 +82,6 @@ export default class UsersController {
 
   // Router PUT /users/:id api route
   public async update({ request, response, params }: HttpContextContract) {
-    // initialize hubspot client
-    const hubspotClient = new Client({ accessToken: Env.get('HUBSPOT_API_KEY') })
 
     // get user data from request body
     const userData = { properties: request.body() }
