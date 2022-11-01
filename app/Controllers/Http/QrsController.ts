@@ -75,16 +75,16 @@ export default class QrsController {
     // structure of qr data
     const qrData = request.body()
 
-    const url = `${Env.get('APP_URL')}/qrs/${uuidv5(qrData.id, Env.get('QR_KEY'))}`
+    const url = `${Env.get('APP_URL')}/qrs/${uuidv5(qrData.id.toString(), Env.get('QR_KEY'))}`
     // create qr in hubspot custom object
     const qr = await hubspotClient.crm.objects.basicApi.create('qrdatas', {
       properties: {
         createdat: new Date().toISOString(),
         updatedat: new Date().toISOString(),
-        uuid: uuidv5(qrData.id, Env.get('QR_KEY')),
+        uuid: uuidv5(qrData.id.toString(), Env.get('QR_KEY')),
         url: url,
         readed: "false",
-        externalid: qrData.id,
+        externalid: qrData.id.toString(),
         externalurl: qrData.url,
         externalreadedurl: qrData.readedUrl,
         // QR url from google api
@@ -97,6 +97,13 @@ export default class QrsController {
       message: 'QR created',
       qr: qr.properties.qrimage,
       id: qr.properties.uuid,
+    })
+  }
+
+  // test uuid route
+  public async test({ response }: HttpContextContract) {
+    return response.created({
+      uuid: uuidv5(1, Env.get('QR_KEY')),
     })
   }
 
