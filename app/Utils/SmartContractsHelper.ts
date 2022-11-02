@@ -27,6 +27,11 @@ export const getGasPrice = async () => {
     return await provider.getGasPrice()
 }
 
+// GEt public key from the wallet
+export const getPublicKey = () => {
+    return wallet.address
+}
+
 // Check if the address wallet is admin on the certiblockFactory contract
 export const isAdmin = async (address: string) => {
     // Check if the address is admin
