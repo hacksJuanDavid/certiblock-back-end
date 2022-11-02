@@ -44,7 +44,7 @@ Route.post('/register', 'AuthController.register')
 // Route for logging in users
 Route.post('/login', 'AuthController.login').middleware('userExists')
 
-//Route group for qr whit api
+//Route group for qr with api
 
 Route.group(() => {
   // test route
@@ -55,7 +55,10 @@ Route.group(() => {
 
   //Route for generating QR
   Route.post('/', 'QrsController.store')
+}).prefix('qrs')
 
-  
-})
-  .prefix('qrs')
+// Route Factory for admin
+Route.group(() => {
+  // Route GET /factories api route
+  Route.get('/', 'FactoriesController.index')
+}).prefix('factories')
