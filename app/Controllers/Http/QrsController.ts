@@ -16,7 +16,7 @@ export default class QrsController {
     // if params.id is not null, get qr by uuid from hubspot else return error 404
     if (params.id) {
       // get page of qrdatas from hubspot
-      const page = await hubspotClient.crm.objects.basicApi.getPage('qrdatas', undefined, undefined, [
+      const page = await hubspotClient.crm.objects.basicApi.getPage('qrdatas', 100, undefined, [
         'uuid',
         'url',
         'readed',
