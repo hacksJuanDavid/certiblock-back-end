@@ -2,7 +2,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { v5 as uuidv5 } from 'uuid'
 import Env from '@ioc:Adonis/Core/Env'
 import { Client } from '@hubspot/api-client'
-import { schema } from "@ioc:Adonis/Core/Validator"
+import { schema } from '@ioc:Adonis/Core/Validator'
 
 // Initialize hubspot client
 const hubspotClient = new Client({ accessToken: Env.get('HUBSPOT_API_KEY') })
@@ -10,30 +10,42 @@ const hubspotClient = new Client({ accessToken: Env.get('HUBSPOT_API_KEY') })
 // Check if qrs object exists in hubspot
 
 export default class QrsController {
-
   // Router GET /qrs api route
   public async index({ response, params }: HttpContextContract) {
     // if params.id is not null, get qr by uuid from hubspot else return error 404
     if (params.id) {
-      // get page of qrdatas from hubspot
-      const page = await hubspotClient.crm.objects.basicApi.getPage('qrdatas', 100, undefined, [
-        'uuid',
-        'url',
-        'readed',
-        'readedat',
-        'externalid',
-        'externalurl',
-        'externalreadedurl',
-      ])
-
-      // get qr with uuid
-      const qr = page.results.find((qr) => qr.properties.uuid === params.id)
+      // get info hubspot by uuid
+      const page = await hubspotClient.crm.objects.searchApi.doSearch('qrdatas', {
+        filterGroups: [
+          {
+            filters: [
+              {
+                propertyName: 'uuid',
+                operator: 'EQ',
+                value: params.id,
+              },
+            ],
+          },
+        ],
+        sorts: [],
+        limit: 1,
+        properties: [
+          'uuid',
+          'url',
+          'readed',
+          'qrimage',
+          'externalid',
+          'externalurl',
+          'externalreadedurl',
+        ],
+        after: 0,
+      })
 
       // if qr exists, return qr else return error 404
-      if (qr) {
+      if (page.results.length > 0) {
+        const qr = page.results[0].properties
         // if qr isn't readed, return qr else return error 404
-        if (qr.properties.readed === 'false') {
-
+        if (qr.readed === 'false') {
           // update qr in huspot, set readed to true and update updatedat property and readedat property
           await hubspotClient.crm.objects.basicApi.update('qrdatas', qr.id, {
             properties: {
@@ -44,10 +56,10 @@ export default class QrsController {
           })
 
           // redirect to external url
-          return response.redirect(qr.properties.externalurl)
+          return response.redirect(qr.externalurl)
         } else {
           // redirect to external readed url
-          return response.redirect(qr.properties.externalreadedurl)
+          return response.redirect(qr.externalreadedurl)
         }
       }
     }
@@ -57,7 +69,6 @@ export default class QrsController {
       message: 'QR not found',
     })
   }
-
 
   // Router POST /qrs api route
   public async store({ request, response }: HttpContextContract) {
@@ -83,12 +94,12 @@ export default class QrsController {
         updatedat: new Date().toISOString(),
         uuid: uuidv5(qrData.id.toString(), Env.get('QR_KEY')),
         url: url,
-        readed: "false",
+        readed: 'false',
         externalid: qrData.id.toString(),
         externalurl: qrData.url,
         externalreadedurl: qrData.readedUrl,
         // QR url from google api
-        qrimage: "https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=" + url + "&choe=UTF-8",
+        qrimage: 'https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=' + url + '&choe=UTF-8',
       },
     })
 
@@ -106,5 +117,4 @@ export default class QrsController {
       uuid: uuidv5(1, Env.get('QR_KEY')),
     })
   }
-
 }
