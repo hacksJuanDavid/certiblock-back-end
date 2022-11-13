@@ -3,6 +3,7 @@ import { v5 as uuidv5 } from 'uuid'
 import Env from '@ioc:Adonis/Core/Env'
 import { Client } from '@hubspot/api-client'
 import { schema } from '@ioc:Adonis/Core/Validator'
+import { setInactiveFLACertiBlock } from 'App/Utils/SmartContractsHelper'
 
 // Initialize hubspot client
 const hubspotClient = new Client({ accessToken: Env.get('HUBSPOT_API_KEY') })
@@ -34,6 +35,7 @@ export default class QrsController {
           'url',
           'readed',
           'qrimage',
+          'views',
           'externalid',
           'externalurl',
           'externalreadedurl',
@@ -46,14 +48,18 @@ export default class QrsController {
         const qr = page.results[0].properties
         // if qr isn't readed, return qr else return error 404
         if (qr.readed === 'false') {
+          console.log(qr)
           // update qr in huspot, set readed to true and update updatedat property and readedat property
-          await hubspotClient.crm.objects.basicApi.update('qrdatas', qr.id, {
+          await hubspotClient.crm.objects.basicApi.update('qrdatas', qr.hs_object_id, {
             properties: {
               readed: 'true',
               updatedat: new Date().toISOString(),
               readedat: new Date().toISOString(),
             },
           })
+
+          // update FLA smart contract to false
+          await setInactiveFLACertiBlock(parseInt(qr.externalid))
 
           // redirect to external url
           return response.redirect(qr.externalurl)

@@ -54,6 +54,7 @@
   "dependencies": {
     "@adonisjs/auth": "^8.2.2",
     "@adonisjs/core": "^5.8.0",
+    "@adonisjs/drive-s3": "^1.3.2",
     "@adonisjs/lucid": "^18.2.0",
     "@adonisjs/repl": "^3.1.0",
     "@ethersproject/abi": "^5.7.0",
@@ -64,6 +65,7 @@
     "adonis5-jwt": "^1.1.7",
     "ethers": "^5.7.2",
     "luxon": "^3.0.4",
+    "nft.storage": "^7.0.0",
     "phc-argon2": "^1.1.3",
     "proxy-addr": "^2.0.7",
     "reflect-metadata": "^0.1.13",

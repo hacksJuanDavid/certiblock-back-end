@@ -3,4 +3,5 @@
 /* eslint-disable */
 export * as utils from "./utils";
 export { CertiblockFactory__factory } from "./CertiblockFactory__factory";
+export { FLACertiblock__factory } from "./FLACertiblock__factory";
 export { NFTCertiBlock__factory } from "./NFTCertiBlock__factory";

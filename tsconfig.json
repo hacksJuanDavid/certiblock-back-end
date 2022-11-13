@@ -23,7 +23,7 @@
       ],
       "Database/*": [
         "./database/*"
-      ],
+      ]
     },
     "types": [
       "@adonisjs/core",
@@ -31,7 +31,8 @@
       "@japa/preset-adonis/build/adonis-typings",
       "@adonisjs/auth",
       "@adonisjs/lucid",
-      "adonis5-jwt"
+      "adonis5-jwt",
+      "@adonisjs/drive-s3"
     ]
   }
 }

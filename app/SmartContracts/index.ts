@@ -28,6 +28,8 @@ export type { CertiblockFactory } from "./contracts/CertiblockFactory";
 export { CertiblockFactory__factory } from "./factories/contracts/CertiblockFactory__factory";
 export type { NFTCertiBlock } from "./contracts/NFTCertiBlock";
 export { NFTCertiBlock__factory } from "./factories/contracts/NFTCertiBlock__factory";
+export type { FLACertiblock } from "./contracts/FLACertiblock";
+export { FLACertiblock__factory } from "./factories/contracts/FLACertiblock__factory";
 export type { Administrator } from "./contracts/utils/Administrator";
 export { Administrator__factory } from "./factories/contracts/utils/Administrator__factory";
 export type { ERC721Psi } from "./erc721psi/contracts/ERC721Psi";
