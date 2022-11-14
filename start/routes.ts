@@ -67,11 +67,11 @@ Route.group(() => {
 // Route for Flas
 Route.group(() => {
   // Route GET /flas api route
-  Route.get('/', 'FlasController.index').middleware('auth:jwt')
+  Route.get('/', 'FlasController.index')
   // Route POST /flas api route
-  Route.post('/', 'FlasController.store').middleware('auth:jwt')
+  Route.post('/', 'FlasController.store')
   // ROUTE PUT /flas/url api route
-  Route.put('/url', 'FlasController.updateContractURL').middleware('auth:jwt')
+  Route.put('/url', 'FlasController.updateContractURL')
   // ROUTE SHOW /flas/:id api route
   Route.get('/:id', 'FlasController.show')
 })
