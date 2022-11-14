@@ -3,7 +3,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Env from '@ioc:Adonis/Core/Env'
 import { createUser } from 'App/Utils/CreateUser'
 import { getUserFromHubspot } from 'App/Utils/GetUserFromHubspot'
-import { schema } from "@ioc:Adonis/Core/Validator"
+import { schema } from '@ioc:Adonis/Core/Validator'
 
 export default class AuthController {
   public async register({ request, response }: HttpContextContract) {
@@ -16,7 +16,7 @@ export default class AuthController {
     })
 
     // get validated data from request body
-    await request.validate({ schema: postSchema })
+    const data = await request.validate({ schema: postSchema })
 
     // Initialize hubspot client
     const hubspotClient = new Client({ accessToken: Env.get('HUBSPOT_API_KEY') })
@@ -25,10 +25,10 @@ export default class AuthController {
     // structure of user data (firstname, lastname, email)
     const userData = {
       properties: {
-        firstname: request.body().firstName,
-        lastname: request.body().lastName,
-        email: request.body().email
-      }
+        firstname: data.firstName,
+        lastname: data.lastName,
+        email: data.email,
+      },
     }
 
     // check if user exists in hubspot if not create user
@@ -52,11 +52,17 @@ export default class AuthController {
   }
 
   public async login({ request, response, auth }: HttpContextContract) {
-    // get user data from request body
-    const { email, password } = request.body()
+    // validate request body
+    const postSchema = schema.create({
+      email: schema.string(),
+      password: schema.string(),
+    })
+
+    // get validated data from request body
+    const data = await request.validate({ schema: postSchema })
 
     // attempt to login
-    const token = await auth.use('jwt').attempt(email, password)
+    const token = await auth.use('jwt').attempt(data.email, data.password)
 
     // return token
     return response.ok({

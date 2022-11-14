@@ -15,6 +15,7 @@ import {
 import { Metadata } from 'App/Utils/UploadIPFS'
 import { DateTime } from 'luxon'
 import { uploadS3 } from 'App/Utils/UploadAmazon'
+import { fetchJson } from 'ethers/lib/utils'
 
 // initialize hubspot client
 const hubspotClient = new Client({ accessToken: Env.get('HUBSPOT_API_KEY') })
@@ -159,6 +160,7 @@ export default class FlasController {
           'externalreadedurl',
           'createdat',
           'readedat',
+          'type'
         ],
         after: 0,
       })
@@ -193,12 +195,28 @@ export default class FlasController {
         // get tokeURI from smart contract
         const tokenURI = await getTokenURI(parseInt(qr.externalid))
 
-        // return ipfs tokenURI, views, createdat, readedat
+        // get metadata from json URI
+        const metadata = await fetchJson(tokenURI)
+
+        console.log(metadata)
+        
+
+        // return from metadata, image, name, description, lote, years, sugar, mililiters, reference, date
+        // return from qr, vies, createdat, readedat, type
         return response.json({
-          tokenURI,
+          image: metadata.image,
+          name: metadata.name,
+          description: metadata.description,
+          lote: metadata.lote,
+          years: metadata.years,
+          sugar: metadata.sugar,
+          mililiters: metadata.mililiters,
+          reference: metadata.reference,
+          date: metadata.date,
           views: qr.views,
           createdat: qr.createdat,
           readedat: qr.readedat,
+          type: qr.type,
         })
       }
     }
