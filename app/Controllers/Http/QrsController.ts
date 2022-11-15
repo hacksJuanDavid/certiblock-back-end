@@ -62,10 +62,10 @@ export default class QrsController {
           await setInactiveFLACertiBlock(parseInt(qr.externalid))
 
           // redirect to external url
-          return response.redirect(qr.externalurl)
+          return response.redirect(qr.externalurl, true)
         } else {
           // redirect to external readed url
-          return response.redirect(qr.externalreadedurl)
+          return response.redirect(qr.externalreadedurl, true)
         }
       }
     }
