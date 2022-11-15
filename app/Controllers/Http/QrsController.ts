@@ -48,7 +48,7 @@ export default class QrsController {
         const qr = page.results[0].properties
         // if qr isn't readed, return qr else return error 404
         if (qr.readed === 'false') {
-          console.log(qr)
+          // console.log(qr)
           // update qr in huspot, set readed to true and update updatedat property and readedat property
           await hubspotClient.crm.objects.basicApi.update('qrdatas', qr.hs_object_id, {
             properties: {
@@ -65,7 +65,9 @@ export default class QrsController {
           return response.redirect(qr.externalurl, false)
         } else {
           // redirect to external readed url
-          return response.redirect(qr.externalreadedurl, false)
+          // return response.redirect(qr.externalreadedurl, false)
+          // redirect to the external url
+          return response.redirect(qr.externalurl, false)
         }
       }
     }

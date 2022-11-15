@@ -90,7 +90,7 @@ export default class FlasController {
               metadata.id.toString(),
               Env.get('QR_KEY')
             )}`,
-            externalreadedurl: `https:certiblock.co/fla/${v5(
+            externalreadedurl: `https://certiblock.co/fla/${v5(
               metadata.id.toString(),
               Env.get('QR_KEY')
             )}`,
@@ -170,7 +170,7 @@ export default class FlasController {
         const qr = page.results[0].properties
         // if qr isn't readed, return qr else return error 404
         if (qr.readed === 'false') {
-          console.log(qr)
+          // console.log(qr)
           // update qr in huspot, set readed to true and update updatedat property and readedat property
           await hubspotClient.crm.objects.basicApi.update('qrdatas', qr.hs_object_id, {
             properties: {
@@ -198,7 +198,7 @@ export default class FlasController {
         // get metadata from json URI
         const metadata = await fetchJson(tokenURI)
 
-        console.log(metadata)
+        // console.log(metadata)
         
 
         // return from metadata, image, name, description, lote, years, sugar, mililiters, reference, date
